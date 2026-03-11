@@ -15,6 +15,15 @@
   --font-heading: Inter, "SF Pro Display", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
 }
 
+@page {
+  size: Letter;
+  margin: 0.6in 0.6in 0.75in;
+}
+
+@page :first {
+  margin: 0;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -29,7 +38,7 @@ body {
 }
 
 .cover-page {
-  min-height: 9.25in;
+  min-height: 11in;
   display: flex;
   align-items: stretch;
   justify-content: center;
@@ -313,5 +322,60 @@ code {
 @media print {
   body {
     background: #ffffff;
+  }
+
+  .cover-page-inner {
+    min-height: 11in;
+    padding: 0.72in 0.65in 0.72in;
+  }
+
+  .cover-page {
+    min-height: 11in;
+  }
+
+  .cover-hero {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.42in;
+    margin-top: 0.28in;
+  }
+
+  .cover-copy {
+    flex: 1 1 auto;
+    max-width: none;
+    width: calc(100% - 3.05in);
+    padding-right: 0;
+  }
+
+  .cover-title {
+    font-size: 31pt;
+    max-width: none;
+  }
+
+  .cover-subtitle {
+    max-width: none;
+    font-size: 13.5pt;
+  }
+
+  .cover-panel {
+    flex: 0 0 2.63in;
+    width: 2.63in;
+    padding: 0.8rem;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .cover-facts {
+    gap: 0.55rem;
+  }
+
+  .cover-fact {
+    padding: 0.72rem 0.78rem;
+  }
+
+  .cover-fact strong {
+    font-size: 13.6pt;
+    line-height: 1.1;
   }
 }

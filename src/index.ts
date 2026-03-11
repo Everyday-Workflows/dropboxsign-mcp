@@ -11,6 +11,7 @@ async function main(): Promise<void> {
   await fileSystemService.ensureDirectories();
 
   const contractRenderer = new ContractRenderer(config, fileSystemService);
+  await contractRenderer.validateDefaultTemplateAssets();
   const dropboxSignClient = new DropboxSignClient(config);
   const vaultService = new VaultService(config);
 

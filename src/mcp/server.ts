@@ -75,6 +75,7 @@ export async function startServer(dependencies: {
         downloadsDir: config.downloadsDir,
         generatedDir: config.generatedDir,
         templatesDir: config.templatesDir,
+        templatesDirSource: config.templatesDirConfigured ? 'env' : 'bundled_default',
         brandName: config.branding.name,
         logoConfigured: Boolean(config.branding.logoPath),
       };

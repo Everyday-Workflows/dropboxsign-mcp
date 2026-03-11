@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import matter from 'gray-matter';
@@ -23,6 +23,13 @@ export interface RenderOptions {
   outputFileName?: string;
 }
 
+function getTemplateAssetPaths(templatesDir: string, templateName: string): { templateHtmlPath: string; templateCssPath: string } {
+  return {
+    templateHtmlPath: path.join(templatesDir, `${templateName}.html`),
+    templateCssPath: path.join(templatesDir, `${templateName}.css`),
+  };
+}
+
 function escapeHtml(value: string): string {
   return value
     .replaceAll('&', '&amp;')
@@ -32,13 +39,35 @@ function escapeHtml(value: string): string {
     .replaceAll("'", '&#39;');
 }
 
+function isSnakeCaseDisplayValue(value: string): boolean {
+  return /^[a-z0-9]+(?:_[a-z0-9]+)+$/.test(value.trim());
+}
+
+function humanizeSnakeCase(value: string): string {
+  return value
+    .trim()
+    .split('_')
+    .filter((part) => part.length > 0)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
+function formatDisplayText(value: string): string {
+  const trimmedValue = value.trim();
+  return isSnakeCaseDisplayValue(trimmedValue) ? humanizeSnakeCase(trimmedValue) : trimmedValue;
+}
+
 function renderMetadataTable(metadata: Record<string, unknown>): string {
   const ignoredKeys = new Set(['tags', 'status', 'cssclasses']);
   const rows = Object.entries(metadata)
     .filter(([key, value]) => !ignoredKeys.has(key) && value !== null && value !== undefined)
     .map(([key, value]) => {
-      const formattedValue = Array.isArray(value) ? value.join(', ') : String(value);
-      return `<tr><th>${escapeHtml(key)}</th><td>${escapeHtml(formattedValue)}</td></tr>`;
+      const formattedValue = Array.isArray(value)
+        ? value.map((item) => (typeof item === 'string' ? formatDisplayText(item) : String(item))).join(', ')
+        : typeof value === 'string'
+          ? formatDisplayText(value)
+          : String(value);
+      return `<tr><th>${escapeHtml(humanizeSnakeCase(key))}</th><td>${escapeHtml(formattedValue)}</td></tr>`;
     })
     .join('');
 
@@ -113,17 +142,28 @@ function extractLabeledValue(markdown: string, label: string): string | undefine
   return match ? stripMarkdownInline(match[1] ?? '') : undefined;
 }
 
-function renderCoverFacts(markdown: string, metadata: Record<string, unknown>): string {
+function extractAgreementEffectiveDate(markdown: string): string | undefined {
+  const match = markdown.match(/entered into as of\s+\*\*(.+?)\*\*/i);
+  return match ? stripMarkdownInline(match[1] ?? '') : undefined;
+}
+
+function renderCoverFacts(markdown: string, metadata: Record<string, unknown>, brandName: string): string {
   const preferredFields = [
     { label: 'Client', value: extractLabeledValue(markdown, 'Client') ?? metadata.client },
     { label: 'Project', value: extractLabeledValue(markdown, 'Project') ?? metadata.project },
-    { label: 'Effective Date', value: extractLabeledValue(markdown, 'Effective Date') ?? metadata.effective_date },
-    { label: 'Service Provider', value: extractLabeledValue(markdown, 'Service Provider') ?? metadata.service_provider },
+    {
+      label: 'Effective Date',
+      value: extractLabeledValue(markdown, 'Effective Date') ?? metadata.effective_date ?? extractAgreementEffectiveDate(markdown),
+    },
+    {
+      label: 'Service Provider',
+      value: extractLabeledValue(markdown, 'Service Provider') ?? metadata.service_provider ?? brandName,
+    },
   ];
 
   const facts = preferredFields
     .filter((fact) => fact.value !== undefined && fact.value !== null && String(fact.value).trim().length > 0)
-    .map((fact) => `<div class="cover-fact"><span class="cover-fact-label">${escapeHtml(fact.label)}</span><strong>${escapeHtml(String(fact.value))}</strong></div>`)
+    .map((fact) => `<div class="cover-fact"><span class="cover-fact-label">${escapeHtml(fact.label)}</span><strong>${escapeHtml(typeof fact.value === 'string' ? formatDisplayText(fact.value) : String(fact.value))}</strong></div>`)
     .join('');
 
   return facts ? `<div class="cover-facts">${facts}</div>` : '';
@@ -149,23 +189,23 @@ export function renderHtmlDocument(markdownSource: string, templateHtml: string,
   const markdownContent = preprocessCallouts(parsed.content);
   const derivedHeadingTitle = extractFirstHeading(parsed.content, 1);
   const derivedSubtitle = typeof metadata.subtitle === 'string' && metadata.subtitle.length > 0
-    ? metadata.subtitle
+    ? formatDisplayText(metadata.subtitle)
     : typeof metadata.project === 'string' && metadata.project.length > 0
-      ? metadata.project
-      : extractFirstHeading(parsed.content, 2);
+      ? formatDisplayText(metadata.project)
+      : formatDisplayText(extractFirstHeading(parsed.content, 2) ?? '');
   const title = typeof metadata.title === 'string' && metadata.title.length > 0
-    ? metadata.title
+    ? formatDisplayText(metadata.title)
     : derivedHeadingTitle
-      ? derivedHeadingTitle
+      ? formatDisplayText(derivedHeadingTitle)
       : options.sourcePath
-        ? path.basename(options.sourcePath, path.extname(options.sourcePath))
-      : 'Dropbox Sign Contract';
+        ? formatDisplayText(path.basename(options.sourcePath, path.extname(options.sourcePath)))
+        : 'Dropbox Sign Contract';
   const brandName = options.brandName ?? 'Everyday Workflows';
 
   const renderer = createMarkdownRenderer();
   const htmlBody = renderer.render(markdownContent);
   const metadataTable = renderMetadataTable(metadata);
-  const coverFacts = renderCoverFacts(parsed.content, metadata);
+  const coverFacts = renderCoverFacts(parsed.content, metadata, brandName);
   const coverLogo = renderLogoMarkup(options.logoDataUri, brandName);
 
   const html = templateHtml
@@ -215,16 +255,61 @@ export class ContractRenderer {
     return `data:${getMimeType(resolvedLogoPath)};base64,${contents.toString('base64')}`;
   }
 
+  private async loadTemplateAssets(templateName: string): Promise<{ templateHtml: string; templateCss: string }> {
+    const { templateHtmlPath, templateCssPath } = getTemplateAssetPaths(this.config.templatesDir, templateName);
+
+    try {
+      const [templateHtml, templateCss] = await Promise.all([
+        readFile(templateHtmlPath, 'utf8'),
+        readFile(templateCssPath, 'utf8'),
+      ]);
+
+      return { templateHtml, templateCss };
+    } catch (error) {
+      const nodeError = error as NodeJS.ErrnoException;
+      if (nodeError.code === 'ENOENT') {
+        throw new Error(
+          `Template "${templateName}" could not be loaded from ${this.config.templatesDir}. Expected files: ${path.basename(templateHtmlPath)} and ${path.basename(templateCssPath)}. ${this.config.templatesDirConfigured ? 'Check DROPBOXSIGN_TEMPLATE_DIR and make sure it points to the directory that contains your contract template files.' : 'Set DROPBOXSIGN_TEMPLATE_DIR to an absolute directory containing your contract template files if you want to override the bundled defaults.'}`,
+        );
+      }
+
+      throw error;
+    }
+  }
+
+  public async validateDefaultTemplateAssets(): Promise<void> {
+    const { templateHtmlPath, templateCssPath } = getTemplateAssetPaths(this.config.templatesDir, 'default');
+    const requiredFiles = [templateHtmlPath, templateCssPath];
+
+    const missingFiles = (await Promise.all(
+      requiredFiles.map(async (filePath) => {
+        try {
+          await access(filePath);
+          return undefined;
+        } catch {
+          return path.basename(filePath);
+        }
+      }),
+    )).filter((fileName): fileName is string => Boolean(fileName));
+
+    if (missingFiles.length === 0) {
+      return;
+    }
+
+    const recoveryHint = this.config.templatesDirConfigured
+      ? 'Check DROPBOXSIGN_TEMPLATE_DIR and make sure it points to a directory that contains at least default.html and default.css.'
+      : 'The bundled default templates could not be found. Reinstall the package or set DROPBOXSIGN_TEMPLATE_DIR to an absolute directory that contains at least default.html and default.css.';
+
+    throw new Error(
+      `Missing required contract template file(s) in ${this.config.templatesDir}: ${missingFiles.join(', ')}. ${recoveryHint}`,
+    );
+  }
+
   public async renderMarkdownFileToPdf(sourcePath: string, options: RenderOptions = {}): Promise<RenderedContractResult> {
     const { templateName = 'default', outputDirectory, outputFileName } = options;
     const resolvedSourcePath = this.fileSystemService.resolveReadablePath(sourcePath);
     const markdown = await readFile(resolvedSourcePath, 'utf8');
-    const templateHtmlPath = path.join(this.config.templatesDir, `${templateName}.html`);
-    const templateCssPath = path.join(this.config.templatesDir, `${templateName}.css`);
-    const [templateHtml, templateCss] = await Promise.all([
-      readFile(templateHtmlPath, 'utf8'),
-      readFile(templateCssPath, 'utf8'),
-    ]);
+    const { templateHtml, templateCss } = await this.loadTemplateAssets(templateName);
 
     const logoDataUri = await this.resolveLogoDataUri();
     const document = renderHtmlDocument(markdown, templateHtml, templateCss, {
@@ -262,11 +347,12 @@ export class ContractRenderer {
         path: pdfPath,
         format: 'Letter',
         printBackground: true,
+        preferCSSPageSize: true,
         margin: {
-          top: '0.6in',
-          right: '0.6in',
-          bottom: '0.75in',
-          left: '0.6in',
+          top: '0',
+          right: '0',
+          bottom: '0',
+          left: '0',
         },
       });
     } finally {

@@ -44,6 +44,12 @@ DROPBOXSIGN_API_KEY=your_dropbox_sign_api_key
 DROPBOXSIGN_TEST_MODE=true
 ```
 
+For any reusable or branded deployment, also set:
+
+```bash
+DROPBOXSIGN_TEMPLATE_DIR=/absolute/path/to/templates
+```
+
 Commonly used optional values:
 
 ```bash
@@ -61,14 +67,16 @@ DROPBOXSIGN_TEMPLATE_DIR=/absolute/path/to/templates
 
 If your contracts live in different client folders each time, you can leave `DROPBOXSIGN_CONTRACTS_DIR` unset and pass absolute file paths directly to the render/send tools.
 
+`DROPBOXSIGN_TEMPLATE_DIR` should point to an absolute directory containing at least `default.html` and `default.css`. If you leave it unset, the server falls back to the bundled templates shipped with this package/repo and `dropboxsign_auth_status` will report `templatesDirSource: "bundled_default"`.
+
 For the full annotated variable list, see [`.env.example`](.env.example).
 
 ## Quick start
 
 1. Install the package and Chromium for Playwright.
-2. Export `DROPBOXSIGN_API_KEY` and set `DROPBOXSIGN_TEST_MODE=true` while validating your setup.
+2. Export `DROPBOXSIGN_API_KEY`, set `DROPBOXSIGN_TEST_MODE=true`, and set `DROPBOXSIGN_TEMPLATE_DIR` if you want a stable custom contract style.
 3. Add the MCP server to your client config.
-4. Run `dropboxsign_auth_status` to confirm config, directories, and test mode.
+4. Run `dropboxsign_auth_status` to confirm config, directories, test mode, and the resolved `templatesDir`.
 5. Render a markdown contract or create a template draft.
 
 ## MCP client config
@@ -91,7 +99,8 @@ For the full annotated variable list, see [`.env.example`](.env.example).
         "DROPBOXSIGN_BRAND_NAME": "My Company",
         "DROPBOXSIGN_LOGO_PATH": "/absolute/path/to/logo.webp",
         "DROPBOXSIGN_GENERATED_DIR": "/absolute/path/to/generated",
-        "DROPBOXSIGN_DOWNLOAD_DIR": "/absolute/path/to/downloads"
+        "DROPBOXSIGN_DOWNLOAD_DIR": "/absolute/path/to/downloads",
+        "DROPBOXSIGN_TEMPLATE_DIR": "/absolute/path/to/templates"
       }
     }
   }
@@ -108,7 +117,8 @@ For the full annotated variable list, see [`.env.example`](.env.example).
       "args": ["/absolute/path/to/dropboxsign-mcp/dist/src/index.js"],
       "env": {
         "DROPBOXSIGN_API_KEY": "...",
-        "DROPBOXSIGN_TEST_MODE": "true"
+        "DROPBOXSIGN_TEST_MODE": "true",
+        "DROPBOXSIGN_TEMPLATE_DIR": "/absolute/path/to/templates"
       }
     }
   }
@@ -146,6 +156,8 @@ Example tool input for `dropboxsign_contract_render_pdf`:
   "templateName": "default"
 }
 ```
+
+Before assuming where styling lives, run `dropboxsign_auth_status` and inspect `templatesDir` plus `templatesDirSource`. That is the source of truth the agent should use.
 
 Example tool input for `dropboxsign_signature_request_send`:
 
@@ -198,6 +210,8 @@ Example tool input for `dropboxsign_signature_request_send`:
 
 The default template renders a dedicated branded cover page on page 1 and starts the contract body on page 2.
 
+The server validates that the resolved template directory contains `default.html` and `default.css` during startup so template-path mistakes fail fast instead of surfacing later during rendering.
+
 ## Supported Dropbox Sign surface
 
 This repository intentionally focuses on local contract rendering plus the Dropbox Sign template and signature-request flows most useful inside MCP clients.
@@ -249,7 +263,7 @@ npm run build
 - Auth currently uses **Dropbox Sign API keys**, not OAuth.
 - Receiving Dropbox Sign callback events is not implemented yet.
 - Premium branding depends on your Dropbox Sign plan and configured API app `client_id`.
-- Markdown rendering uses the bundled `templates/default.html` and `templates/default.css` unless you replace them.
+- Markdown rendering uses the resolved template directory reported by `dropboxsign_auth_status`. By default that is the bundled `templates/default.html` and `templates/default.css` shipped with the package unless you override it with `DROPBOXSIGN_TEMPLATE_DIR`.
 
 ## License
 

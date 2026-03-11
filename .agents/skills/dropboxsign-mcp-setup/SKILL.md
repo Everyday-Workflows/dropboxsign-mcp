@@ -60,6 +60,7 @@ Before setup, confirm the user has:
 |---|---|
 | `DROPBOXSIGN_TEST_MODE` | Set to `true` while testing. No real emails sent, no quota used. |
 | `DROPBOXSIGN_CLIENT_ID` | Your Dropbox Sign API app client_id. Used for branding. |
+| `DROPBOXSIGN_TEMPLATE_DIR` | Strongly recommended for reusable deployments. Absolute directory containing your contract styling templates. Must contain at least `default.html` and `default.css`. |
 | `DROPBOXSIGN_CONTRACTS_DIR` | Optional absolute path to a stable root folder of markdown contract files. If contracts live in different client folders each time, leave this unset and pass `sourcePath` or `filePaths` directly in tool calls. |
 
 ### Signer preset ("me")
@@ -83,7 +84,7 @@ Before setup, confirm the user has:
 |---|---|
 | `DROPBOXSIGN_GENERATED_DIR` | Where rendered HTML/PDF contracts are saved. Default: `~/.local/share/dropboxsign-mcp/generated` |
 | `DROPBOXSIGN_DOWNLOAD_DIR` | Where downloaded signed documents are saved. Default: `~/.local/share/dropboxsign-mcp/downloads` |
-| `DROPBOXSIGN_TEMPLATE_DIR` | Where HTML/CSS brand templates live. Default: `./templates` in the repo root. |
+| `DROPBOXSIGN_TEMPLATE_DIR` | Where HTML/CSS brand templates live. Default: the bundled `templates/` directory shipped with this repo/package. For a stable custom brand across MCP launch locations, set this to an absolute directory containing at least `default.html` and `default.css`. |
 
 ---
 
@@ -106,6 +107,7 @@ export DROPBOXSIGN_BRAND_NAME="My Company"
 export DROPBOXSIGN_LOGO_PATH="/home/yourname/assets/logo.webp"
 export DROPBOXSIGN_GENERATED_DIR="/home/yourname/dropboxsign/generated"
 export DROPBOXSIGN_DOWNLOAD_DIR="/home/yourname/dropboxsign/downloads"
+export DROPBOXSIGN_TEMPLATE_DIR="/home/yourname/dropboxsign/templates"
 ```
 
 Then reload:
@@ -131,6 +133,7 @@ export DROPBOXSIGN_BRAND_NAME="My Company"
 export DROPBOXSIGN_LOGO_PATH="/Users/yourname/assets/logo.webp"
 export DROPBOXSIGN_GENERATED_DIR="/Users/yourname/dropboxsign/generated"
 export DROPBOXSIGN_DOWNLOAD_DIR="/Users/yourname/dropboxsign/downloads"
+export DROPBOXSIGN_TEMPLATE_DIR="/Users/yourname/dropboxsign/templates"
 ```
 
 Then reload:
@@ -174,6 +177,7 @@ $env:DROPBOXSIGN_BRAND_NAME = "My Company"
 $env:DROPBOXSIGN_LOGO_PATH = "C:\Users\yourname\assets\logo.webp"
 $env:DROPBOXSIGN_GENERATED_DIR = "C:\Users\yourname\dropboxsign\generated"
 $env:DROPBOXSIGN_DOWNLOAD_DIR = "C:\Users\yourname\dropboxsign\downloads"
+$env:DROPBOXSIGN_TEMPLATE_DIR = "C:\Users\yourname\dropboxsign\templates"
 ```
 
 Save and reload:
@@ -257,7 +261,8 @@ Built entrypoint: `dist/src/index.js`
         "DROPBOXSIGN_BRAND_NAME": "My Company",
         "DROPBOXSIGN_LOGO_PATH": "/absolute/path/to/logo.webp",
         "DROPBOXSIGN_GENERATED_DIR": "/absolute/path/to/generated",
-        "DROPBOXSIGN_DOWNLOAD_DIR": "/absolute/path/to/downloads"
+        "DROPBOXSIGN_DOWNLOAD_DIR": "/absolute/path/to/downloads",
+        "DROPBOXSIGN_TEMPLATE_DIR": "/absolute/path/to/templates"
       }
     }
   }
@@ -285,6 +290,8 @@ Expected success:
 - `clientIdConfigured: true` (if set)
 - `signerPreset.email` shows your email (if set)
 - `contractsDir` shows your contracts path (if set)
+- `templatesDir` shows the exact directory the server will read `.html`/`.css` styling from
+- `templatesDirSource` is `env` when `DROPBOXSIGN_TEMPLATE_DIR` is set, otherwise `bundled_default`
 
 ---
 
@@ -320,6 +327,8 @@ And tool-call examples like:
 }
 ```
 
+When styling or branding is involved, explicitly tell the model to treat `dropboxsign_auth_status.templatesDir` as the source of truth before claiming where templates live.
+
 ---
 
 ## Troubleshooting
@@ -334,7 +343,9 @@ And tool-call examples like:
 **PDF rendering fails:**
 1. run `npx playwright install chromium`
 2. verify `DROPBOXSIGN_LOGO_PATH` exists if branding is enabled
-3. inspect generated HTML in `DROPBOXSIGN_GENERATED_DIR`
+3. run `dropboxsign_auth_status` and verify `templatesDir` / `templatesDirSource`
+4. confirm the resolved template directory contains `default.html` and `default.css`
+5. inspect generated HTML in `DROPBOXSIGN_GENERATED_DIR`
 
 **Contracts listing returns empty:**
 1. verify `DROPBOXSIGN_CONTRACTS_DIR` is set and points to a real directory

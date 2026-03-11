@@ -22,7 +22,9 @@
     "document-automation",
     "typescript"
   ],
-  "bin": "./bin/dropboxsign-mcp.js",
+  "bin": {
+    "dropboxsign-mcp": "bin/dropboxsign-mcp.js"
+  },
   "files": [
     "bin",
     "dist/src",

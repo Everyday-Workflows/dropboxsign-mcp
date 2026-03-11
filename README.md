@@ -40,6 +40,7 @@ Recommended:
 ```bash
 DROPBOXSIGN_TEST_MODE=true
 DROPBOXSIGN_CLIENT_ID=your_dropbox_sign_api_app_client_id
+# Optional: only set this if you keep contracts under one stable root directory
 DROPBOXSIGN_CONTRACTS_DIR=/absolute/path/to/your/contracts
 ```
 
@@ -59,6 +60,101 @@ DROPBOXSIGN_LOGO_PATH=/absolute/path/to/your/logo.webp
 DROPBOXSIGN_GENERATED_DIR=/absolute/path/to/generated
 DROPBOXSIGN_DOWNLOAD_DIR=/absolute/path/to/downloads
 DROPBOXSIGN_TEMPLATE_DIR=/absolute/path/to/templates
+```
+
+If your contracts live in different client/project folders each time, you can leave `DROPBOXSIGN_CONTRACTS_DIR` unset and pass absolute `sourcePath` values directly to the render/send tools.
+
+## Set environment variables by OS
+
+### Linux
+
+Add to `~/.bashrc`:
+
+```bash
+export DROPBOXSIGN_API_KEY="your_api_key_here"
+export DROPBOXSIGN_TEST_MODE="true"
+export DROPBOXSIGN_CLIENT_ID="your_client_id_here"
+# Optional: only set if you have one stable contracts root
+export DROPBOXSIGN_CONTRACTS_DIR="/home/yourname/contracts"
+export DROPBOXSIGN_SIGNER_NAME="Your Name"
+export DROPBOXSIGN_SIGNER_EMAIL="you@example.com"
+export DROPBOXSIGN_SIGNER_ROLE="Service Provider"
+export DROPBOXSIGN_BRAND_NAME="My Company"
+export DROPBOXSIGN_LOGO_PATH="/home/yourname/assets/logo.webp"
+export DROPBOXSIGN_GENERATED_DIR="/home/yourname/dropboxsign/generated"
+export DROPBOXSIGN_DOWNLOAD_DIR="/home/yourname/dropboxsign/downloads"
+```
+
+Then reload:
+
+```bash
+source ~/.bashrc
+```
+
+### macOS
+
+Add to `~/.zshrc`:
+
+```bash
+export DROPBOXSIGN_API_KEY="your_api_key_here"
+export DROPBOXSIGN_TEST_MODE="true"
+export DROPBOXSIGN_CLIENT_ID="your_client_id_here"
+# Optional: only set if you have one stable contracts root
+export DROPBOXSIGN_CONTRACTS_DIR="/Users/yourname/contracts"
+export DROPBOXSIGN_SIGNER_NAME="Your Name"
+export DROPBOXSIGN_SIGNER_EMAIL="you@example.com"
+export DROPBOXSIGN_SIGNER_ROLE="Service Provider"
+export DROPBOXSIGN_BRAND_NAME="My Company"
+export DROPBOXSIGN_LOGO_PATH="/Users/yourname/assets/logo.webp"
+export DROPBOXSIGN_GENERATED_DIR="/Users/yourname/dropboxsign/generated"
+export DROPBOXSIGN_DOWNLOAD_DIR="/Users/yourname/dropboxsign/downloads"
+```
+
+Then reload:
+
+```bash
+source ~/.zshrc
+```
+
+If you use Bash on macOS, use `~/.bash_profile` instead.
+
+### Windows
+
+#### Option A — Environment Variables UI
+
+1. Open **Start** → search **Environment Variables**
+2. Open **Edit the system environment variables**
+3. Click **Environment Variables**
+4. Add the `DROPBOXSIGN_*` variables under **User variables**
+5. Restart your terminal and MCP client
+
+#### Option B — PowerShell profile
+
+```powershell
+notepad $PROFILE
+```
+
+Add:
+
+```powershell
+$env:DROPBOXSIGN_API_KEY = "your_api_key_here"
+$env:DROPBOXSIGN_TEST_MODE = "true"
+$env:DROPBOXSIGN_CLIENT_ID = "your_client_id_here"
+# Optional: only set if you have one stable contracts root
+$env:DROPBOXSIGN_CONTRACTS_DIR = "C:\Users\yourname\contracts"
+$env:DROPBOXSIGN_SIGNER_NAME = "Your Name"
+$env:DROPBOXSIGN_SIGNER_EMAIL = "you@example.com"
+$env:DROPBOXSIGN_SIGNER_ROLE = "Service Provider"
+$env:DROPBOXSIGN_BRAND_NAME = "My Company"
+$env:DROPBOXSIGN_LOGO_PATH = "C:\Users\yourname\assets\logo.webp"
+$env:DROPBOXSIGN_GENERATED_DIR = "C:\Users\yourname\dropboxsign\generated"
+$env:DROPBOXSIGN_DOWNLOAD_DIR = "C:\Users\yourname\dropboxsign\downloads"
+```
+
+Reload:
+
+```powershell
+. $PROFILE
 ```
 
 ## Install
@@ -170,13 +266,13 @@ Supported:
 - send signature request with template
 - list signature requests
 - get signature request
-- download signature request files to local storage
-
-Not supported yet:
 - cancel signature request
 - send reminder
 - update signer details after send
-- reorder or modify in-flight requests
+- download signature request files to local storage
+
+Not supported yet:
+- reorder or modify in-flight requests beyond signer update
 - release hold / remove access / split embedded flows
 - file URL / data URI variants
 - embedded signing and other embedded signature request helper endpoints

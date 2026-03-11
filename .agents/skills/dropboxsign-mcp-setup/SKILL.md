@@ -15,6 +15,14 @@ user-invocable: true
 Use this skill when setting up, reconfiguring, or troubleshooting the local
 Dropbox Sign MCP server in this repo.
 
+## Agent behavior
+
+- Do **not** inspect, read, modify, or claim to have access to the user's OS-level environment variables.
+- Do **not** tell the user that you set `.bashrc`, `.zshrc`, Windows Environment Variables, or PowerShell profile entries unless the user explicitly did that themselves.
+- Only instruct the user how to set environment variables on their operating system.
+- Treat `DROPBOXSIGN_*` values as user-provided configuration, not something the agent can assume is already available.
+- After the user updates environment variables, tell them to restart their MCP client and verify with `dropboxsign_auth_status`.
+
 ## What this skill does
 
 Guide the user through:
@@ -52,7 +60,7 @@ Before setup, confirm the user has:
 |---|---|
 | `DROPBOXSIGN_TEST_MODE` | Set to `true` while testing. No real emails sent, no quota used. |
 | `DROPBOXSIGN_CLIENT_ID` | Your Dropbox Sign API app client_id. Used for branding. |
-| `DROPBOXSIGN_CONTRACTS_DIR` | Absolute path to a folder of markdown contract files. |
+| `DROPBOXSIGN_CONTRACTS_DIR` | Optional absolute path to a stable root folder of markdown contract files. If contracts live in different client folders each time, leave this unset and pass `sourcePath` directly to render/send tools. |
 
 ### Signer preset ("me")
 
@@ -89,6 +97,7 @@ Add to `~/.bashrc` (or `~/.bash_profile` if using login shells):
 export DROPBOXSIGN_API_KEY="your_api_key_here"
 export DROPBOXSIGN_TEST_MODE="true"
 export DROPBOXSIGN_CLIENT_ID="your_client_id_here"
+# Optional: set only if you keep contracts under one stable root directory
 export DROPBOXSIGN_CONTRACTS_DIR="/home/yourname/contracts"
 export DROPBOXSIGN_SIGNER_NAME="Your Name"
 export DROPBOXSIGN_SIGNER_EMAIL="you@example.com"
@@ -113,6 +122,7 @@ Add to `~/.zshrc` (default shell since macOS Catalina):
 export DROPBOXSIGN_API_KEY="your_api_key_here"
 export DROPBOXSIGN_TEST_MODE="true"
 export DROPBOXSIGN_CLIENT_ID="your_client_id_here"
+# Optional: set only if you keep contracts under one stable root directory
 export DROPBOXSIGN_CONTRACTS_DIR="/Users/yourname/contracts"
 export DROPBOXSIGN_SIGNER_NAME="Your Name"
 export DROPBOXSIGN_SIGNER_EMAIL="you@example.com"
@@ -155,6 +165,7 @@ Add lines like:
 $env:DROPBOXSIGN_API_KEY = "your_api_key_here"
 $env:DROPBOXSIGN_TEST_MODE = "true"
 $env:DROPBOXSIGN_CLIENT_ID = "your_client_id_here"
+# Optional: set only if you keep contracts under one stable root directory
 $env:DROPBOXSIGN_CONTRACTS_DIR = "C:\Users\yourname\contracts"
 $env:DROPBOXSIGN_SIGNER_NAME = "Your Name"
 $env:DROPBOXSIGN_SIGNER_EMAIL = "you@example.com"
@@ -279,12 +290,13 @@ Expected success:
 
 ## First useful workflow
 
-1. find a contract with `dropboxsign_vault_list_contracts`
-2. render it with `dropboxsign_contract_render_pdf`
-3. create an embedded template draft with `dropboxsign_template_create_embedded_draft`
-4. open the returned `editUrl` in Dropbox Sign to place signature fields
-5. send with `dropboxsign_signature_request_send_with_template`
-6. download executed files with `dropboxsign_signature_request_download`
+1. if you have a stable contracts root, find a contract with `dropboxsign_vault_list_contracts`
+2. otherwise, skip listing and pass an absolute markdown `sourcePath` directly to `dropboxsign_contract_render_pdf`
+3. render it with `dropboxsign_contract_render_pdf`
+4. create an embedded template draft with `dropboxsign_template_create_embedded_draft`
+5. open the returned `editUrl` in Dropbox Sign to place signature fields
+6. send with `dropboxsign_signature_request_send_with_template`
+7. download executed files with `dropboxsign_signature_request_download`
 
 ---
 
@@ -305,7 +317,8 @@ Expected success:
 **Contracts listing returns empty:**
 1. verify `DROPBOXSIGN_CONTRACTS_DIR` is set and points to a real directory
 2. confirm the directory contains `.md` files
-3. ensure the path is readable by the local process
+3. if your contracts live in different folders per client, leave `DROPBOXSIGN_CONTRACTS_DIR` unset and use direct `sourcePath` values instead
+4. ensure the path is readable by the local process
 
 **Windows path issues:**
 - use forward slashes or escaped backslashes in JSON configs: `C:/Users/...` or `C:\\Users\\...`

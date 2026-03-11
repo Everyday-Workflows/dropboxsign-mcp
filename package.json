@@ -1,0 +1,28 @@
+{
+  "name": "dropboxsign-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local-only MCP server for Dropbox Sign with API-key auth, contract rendering, vault integration, and document downloads.",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx src/index.ts",
+    "lint": "tsc --noEmit -p tsconfig.json",
+    "start": "node dist/src/index.js",
+    "test": "tsx --test test/**/*.test.ts"
+  },
+  "dependencies": {
+    "@dropbox/sign": "^1.10.0",
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "gray-matter": "^4.0.3",
+    "markdown-it": "^14.1.1",
+    "playwright": "^1.58.2",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/markdown-it": "^14.1.2",
+    "@types/node": "^24.6.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}

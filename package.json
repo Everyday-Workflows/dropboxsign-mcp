@@ -1,13 +1,47 @@
 {
-  "name": "dropboxsign-mcp",
+  "name": "@alexautomates/dropboxsign-mcp",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
-  "description": "Local-only MCP server for Dropbox Sign with API-key auth, contract rendering, vault integration, and document downloads.",
+  "description": "Local-first MCP server for Dropbox Sign: render branded contract PDFs, create template drafts, and send/manage signature requests.",
+  "license": "MIT",
+  "homepage": "https://github.com/Everyday-Workflows/dropboxsign-mcp#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Everyday-Workflows/dropboxsign-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Everyday-Workflows/dropboxsign-mcp/issues"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "dropbox-sign",
+    "hellosign",
+    "esignature",
+    "contracts",
+    "document-automation",
+    "typescript"
+  ],
+  "bin": {
+    "dropboxsign-mcp": "./bin/dropboxsign-mcp.js"
+  },
+  "files": [
+    "bin",
+    "dist/src",
+    "templates",
+    ".env.example"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dev": "tsx src/index.ts",
     "lint": "tsc --noEmit -p tsconfig.json",
+    "prepack": "npm run build",
     "start": "node dist/src/index.js",
     "test": "tsx --test test/**/*.test.ts"
   },

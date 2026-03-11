@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mock Service Agreement</title>
+    <style>:root {
+  color-scheme: light;
+  --ink: #0f172a;
+  --muted: #5b6475;
+  --border: rgba(15, 23, 42, 0.1);
+  --accent: #175cd3;
+  --accent-strong: #0f4fb8;
+  --accent-soft: #eef4ff;
+  --warning: #9a6700;
+  --warning-soft: #fff8e6;
+  --surface: #ffffff;
+  --surface-alt: #f7f9fc;
+  --surface-elevated: rgba(255, 255, 255, 0.92);
+  --font-body: Inter, "SF Pro Text", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-heading: Inter, "SF Pro Display", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--surface-alt);
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.55;
+  font-size: 11pt;
+}
+
+.cover-page {
+  min-height: 9.25in;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  background:
+    radial-gradient(circle at top right, rgba(23, 92, 211, 0.12), transparent 28%),
+    linear-gradient(180deg, #ffffff 0%, #f8fbff 58%, #f4f8ff 100%);
+  page-break-after: always;
+  break-after: page;
+}
+
+.cover-page-inner {
+  width: 100%;
+  max-width: 8in;
+  padding: 0.72in 0.65in 0.85in;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  gap: 1rem;
+}
+
+.cover-page-inner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-top: 6px solid rgba(23, 92, 211, 0.92);
+  pointer-events: none;
+}
+
+.cover-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+}
+
+.cover-logo-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.cover-logo {
+  max-width: 2.7in;
+  max-height: 0.85in;
+  object-fit: contain;
+}
+
+.cover-brand-mark {
+  font-size: 16pt;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: var(--accent);
+}
+
+.cover-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(2.35in, 0.95fr);
+  gap: 1rem;
+  align-items: end;
+  margin-top: 0.35in;
+}
+
+.cover-copy {
+  max-width: 4.85in;
+  padding-right: 0.35in;
+}
+
+.document-shell {
+  max-width: 8in;
+  margin: 0 auto;
+  background: var(--surface);
+}
+
+.eyebrow {
+  color: var(--accent-strong);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 8.5pt;
+  font-weight: 700;
+  margin-bottom: 0.85rem;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-heading);
+  color: var(--ink);
+  margin: 1.1rem 0 0.55rem;
+}
+
+h1 {
+  font-size: 24pt;
+  margin-top: 0;
+}
+
+h2 {
+  font-size: 16pt;
+  padding-top: 0.55rem;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+  letter-spacing: -0.02em;
+}
+
+h3 {
+  font-size: 13pt;
+  letter-spacing: -0.01em;
+}
+
+.cover-title {
+  font-size: 35pt;
+  line-height: 0.98;
+  letter-spacing: -0.05em;
+  max-width: 6.2in;
+  margin-bottom: 0.9rem;
+  font-weight: 800;
+}
+
+.cover-subtitle {
+  font-size: 14.5pt;
+  color: var(--muted);
+  max-width: 4.8in;
+  margin: 0;
+  line-height: 1.35;
+}
+
+.cover-panel {
+  background: var(--surface-elevated);
+  border: 1px solid rgba(23, 92, 211, 0.12);
+  border-radius: 24px;
+  padding: 1rem;
+  box-shadow:
+    0 1px 1px rgba(15, 23, 42, 0.02),
+    0 10px 30px rgba(23, 92, 211, 0.08);
+  backdrop-filter: blur(6px);
+}
+
+.cover-panel-label {
+  font-size: 8.5pt;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.8rem;
+}
+
+.cover-facts {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.72rem;
+}
+
+.cover-fact {
+  padding: 0.85rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff, rgba(248, 250, 252, 0.92));
+}
+
+.cover-fact-label {
+  display: block;
+  font-size: 8.3pt;
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+  color: var(--muted);
+  margin-bottom: 0.32rem;
+}
+
+.cover-fact strong {
+  display: block;
+  font-size: 15pt;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.metadata,
+.contract-body {
+  padding: 0 0.1rem;
+}
+
+.metadata {
+  margin-top: 0.2rem;
+}
+
+p,
+li,
+blockquote,
+td,
+th {
+  orphans: 3;
+  widows: 3;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+th,
+td {
+  border: 1px solid var(--border);
+  padding: 0.55rem 0.65rem;
+  vertical-align: top;
+}
+
+th {
+  width: 34%;
+  text-align: left;
+  background: var(--surface-alt);
+}
+
+.metadata h2 {
+  border-top: none;
+  margin-top: 0;
+  font-size: 11pt;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+.callout {
+  margin: 1rem 0;
+  padding: 0.9rem 1rem;
+  border-left: 4px solid var(--accent);
+  background: var(--accent-soft);
+  border-radius: 0.35rem;
+}
+
+.callout-title {
+  font-weight: 700;
+  margin-bottom: 0.45rem;
+  text-transform: capitalize;
+}
+
+.callout-warning {
+  border-left-color: var(--warning);
+  background: var(--warning-soft);
+}
+
+.contract-body {
+  color: #1f2937;
+}
+
+.contract-body > :first-child {
+  margin-top: 0.25rem;
+}
+
+.contract-body h1:first-child,
+.contract-body h2:first-child {
+  display: none;
+}
+
+.contract-body hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1.5rem 0;
+}
+
+.contract-body strong {
+  color: #101828;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+ul,
+ol {
+  padding-left: 1.25rem;
+}
+
+code {
+  background: #eef2f8;
+  padding: 0.1rem 0.25rem;
+  border-radius: 0.2rem;
+  font-size: 0.95em;
+}
+
+@media print {
+  body {
+    background: #ffffff;
+  }
+}
+</style>
+  </head>
+  <body>
+    <section class="cover-page">
+      <div class="cover-page-inner">
+        <div class="cover-topbar">
+          <div class="cover-logo-wrap"><div class="cover-brand-mark">Evergreen Studio</div></div>
+        </div>
+
+        <div class="cover-hero">
+          <div class="cover-copy">
+            <div class="eyebrow">Evergreen Studio</div>
+            <h1 class="cover-title">Mock Service Agreement</h1>
+            <p class="cover-subtitle">Website analytics and reporting implementation</p>
+          </div>
+
+          <aside class="cover-panel">
+            <div class="cover-panel-label">Prepared for</div>
+            <div class="cover-facts"><div class="cover-fact"><span class="cover-fact-label">Client</span><strong>Northwind Trail Outfitters</strong></div><div class="cover-fact"><span class="cover-fact-label">Project</span><strong>GA4 + Search Console Visibility Program</strong></div><div class="cover-fact"><span class="cover-fact-label">Effective Date</span><strong>April 1, 2026</strong></div><div class="cover-fact"><span class="cover-fact-label">Service Provider</span><strong>Evergreen Studio LLC</strong></div></div>
+          </aside>
+        </div>
+      </div>
+    </section>
+    <main class="document-shell">
+      <section class="metadata"><h2>Document Details</h2><table><tr><th>title</th><td>Mock Service Agreement</td></tr><tr><th>subtitle</th><td>Website analytics and reporting implementation</td></tr><tr><th>client</th><td>Northwind Trail Outfitters</td></tr><tr><th>project</th><td>GA4 + Search Console Visibility Program</td></tr><tr><th>effective_date</th><td>April 1, 2026</td></tr><tr><th>service_provider</th><td>Evergreen Studio LLC</td></tr></table></section>
+      <article class="contract-body"><h1>Mock Service Agreement</h1>
+<h2>Website analytics and reporting implementation</h2>
+<div class="callout callout-warning"><div class="callout-title">warning</div><div class="callout-body">This document is fictional and included only as a sample render for the public repository.</div></div>
+<p><strong>Client:</strong> Northwind Trail Outfitters<br>
+<strong>Project:</strong> GA4 + Search Console Visibility Program<br>
+<strong>Effective Date:</strong> April 1, 2026<br>
+<strong>Service Provider:</strong> Evergreen Studio LLC</p>
+<h2>1. Scope of Services</h2>
+<p>Evergreen Studio LLC will configure and deliver the following work for Northwind Trail Outfitters:</p>
+<ul>
+<li>Google Analytics 4 property review and event mapping</li>
+<li>Google Search Console verification and sitemap review</li>
+<li>Dashboard setup for weekly executive reporting</li>
+<li>Monthly performance summary with recommendations</li>
+</ul>
+<h2>2. Deliverables</h2>
+<p>The Service Provider will deliver the following items during the initial engagement period:</p>
+<ol>
+<li>Analytics implementation checklist</li>
+<li>KPI dashboard with traffic, conversion, and CTR trends</li>
+<li>Search performance snapshot for top landing pages</li>
+<li>One strategy call per month</li>
+</ol>
+<h2>3. Timeline</h2>
+<p>Implementation begins within five business days of signature. Initial setup is expected to conclude within fourteen business days, subject to timely access to required accounts.</p>
+<h2>4. Fees</h2>
+<p>The Client agrees to the following fees:</p>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th style="text-align:right">Amount</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Initial setup</td>
+<td style="text-align:right">$2,500</td>
+</tr>
+<tr>
+<td>Monthly reporting retainer</td>
+<td style="text-align:right">$850</td>
+</tr>
+</tbody>
+</table>
+<p>Invoices are due within seven calendar days of issue.</p>
+<h2>5. Client Responsibilities</h2>
+<p>The Client will provide:</p>
+<ul>
+<li>Access to the website CMS or tag manager</li>
+<li>Access to Google Analytics and Google Search Console</li>
+<li>A point of contact for approvals within two business days</li>
+</ul>
+<h2>6. Confidentiality</h2>
+<p>Both parties will keep non-public business, customer, and technical information confidential and will use that information only for the purpose of fulfilling this agreement.</p>
+<h2>7. Term and Termination</h2>
+<p>Either party may terminate the monthly reporting retainer with fourteen days written notice. Fees for services already performed remain due.</p>
+<h2>8. Signatures</h2>
+<p>By signing, both parties agree to the terms of this Mock Service Agreement.</p>
+<p><strong>Client:</strong> Northwind Trail Outfitters<br>
+<strong>Authorized Signer:</strong> Jordan Hale</p>
+<p><strong>Service Provider:</strong> Evergreen Studio LLC<br>
+<strong>Authorized Signer:</strong> Riley Mercer</p>
+</article>
+    </main>
+  </body>
+</html>

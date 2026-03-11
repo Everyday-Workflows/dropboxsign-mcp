@@ -324,30 +324,39 @@ code {
     background: #ffffff;
   }
 
-  .cover-page-inner {
+  .cover-page {
     min-height: 11in;
+    height: 11in;
+    overflow: hidden;
+  }
+
+  .cover-page-inner {
+    height: 11in;
+    min-height: unset;
     padding: 0.72in 0.65in 0.72in;
     position: relative;
   }
 
-  .cover-page {
-    min-height: 11in;
-  }
-
+  /* Use a stable two-column grid — Chromium PDF compositor honours grid
+     reliably; absolute positioning on the first page is frequently dropped. */
   .cover-hero {
-    display: block;
-    position: relative;
-    min-height: 8.45in;
+    display: grid;
+    grid-template-columns: 1fr 2.65in;
+    grid-template-rows: 1fr;
+    column-gap: 0.48in;
+    align-items: end;
+    flex: 1;
     margin-top: 0.12in;
+    /* Fill the remaining vertical space inside the page */
+    min-height: calc(11in - 0.72in - 0.72in - 0.9in); /* page - top pad - bot pad - topbar */
   }
 
   .cover-copy {
-    position: absolute;
-    left: 0;
-    bottom: 0;
+    grid-column: 1;
+    grid-row: 1;
     max-width: none;
-    width: 3.72in;
     padding-right: 0;
+    align-self: end;
   }
 
   .cover-title {
@@ -360,10 +369,11 @@ code {
     font-size: 13.5pt;
   }
 
+  /* Panel is column 2, anchored to the top of the grid row */
   .cover-panel {
-    position: absolute;
-    top: 0;
-    right: 0;
+    grid-column: 2;
+    grid-row: 1;
+    align-self: start;
     width: 2.58in;
     padding: 0.8rem;
     break-inside: avoid;

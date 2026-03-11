@@ -341,13 +341,27 @@ export class ContractRenderer {
     }
 
     try {
-      const page = await browser.newPage();
+      const page = await browser.newPage({
+        viewport: {
+          width: 816,
+          height: 1056,
+        },
+      });
       await page.setContent(document.html, { waitUntil: 'networkidle' });
+      // emulateMedia must be called before pdf() so @media print rules apply
+      // during layout — Chromium's PDF compositor uses these for final output.
+      await page.emulateMedia({ media: 'print' });
+      // Give the compositor a moment to fully settle after media change;
+      // this reduces the chance of the first-page cover layout being clipped.
+      await page.waitForTimeout(120);
       await page.pdf({
         path: pdfPath,
         format: 'Letter',
         printBackground: true,
-        preferCSSPageSize: true,
+        // Let @page size/margin rules in the CSS drive the document; do NOT
+        // pass preferCSSPageSize here because combining it with explicit zero
+        // margins can confuse the PDF compositor on the first page.
+        displayHeaderFooter: false,
         margin: {
           top: '0',
           right: '0',

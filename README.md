@@ -64,6 +64,41 @@ DROPBOXSIGN_TEMPLATE_DIR=/absolute/path/to/templates
 
 If your contracts live in different client/project folders each time, you can leave `DROPBOXSIGN_CONTRACTS_DIR` unset and pass absolute `sourcePath` values directly to the render/send tools.
 
+## Using direct file paths
+
+If you do **not** set `DROPBOXSIGN_CONTRACTS_DIR`, you can still use the MCP server by passing absolute file paths directly in prompts and tool calls.
+
+Examples:
+
+```text
+Render /absolute/path/to/contract.md to PDF
+Create an embedded template draft from /absolute/path/to/contract.md
+Send /absolute/path/to/contract.pdf for signature
+```
+
+Example tool input for `dropboxsign_contract_render_pdf`:
+
+```json
+{
+  "sourcePath": "/absolute/path/to/contract.md",
+  "templateName": "default"
+}
+```
+
+Example tool input for `dropboxsign_signature_request_send`:
+
+```json
+{
+  "filePaths": ["/absolute/path/to/contract.md"],
+  "signers": [
+    {
+      "name": "Client Name",
+      "emailAddress": "client@example.com"
+    }
+  ]
+}
+```
+
 ## Set environment variables by OS
 
 ### Linux
@@ -287,6 +322,8 @@ If a Dropbox Sign feature is missing, treat that as "not wrapped by this MCP ser
    - send it directly with `dropboxsign_signature_request_send`, or
    - create a reusable template draft with `dropboxsign_template_create_embedded_draft` and place fields in Dropbox Sign’s embedded editor.
 4. Download executed files locally with `dropboxsign_signature_request_download`.
+
+If you do not use `DROPBOXSIGN_CONTRACTS_DIR`, skip contract listing and pass the absolute contract path directly in `sourcePath` or `filePaths`.
 
 The default template now renders a dedicated branded cover page on page 1 and starts the contract body on page 2.
 

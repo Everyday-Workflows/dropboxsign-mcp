@@ -60,7 +60,7 @@ Before setup, confirm the user has:
 |---|---|
 | `DROPBOXSIGN_TEST_MODE` | Set to `true` while testing. No real emails sent, no quota used. |
 | `DROPBOXSIGN_CLIENT_ID` | Your Dropbox Sign API app client_id. Used for branding. |
-| `DROPBOXSIGN_CONTRACTS_DIR` | Optional absolute path to a stable root folder of markdown contract files. If contracts live in different client folders each time, leave this unset and pass `sourcePath` directly to render/send tools. |
+| `DROPBOXSIGN_CONTRACTS_DIR` | Optional absolute path to a stable root folder of markdown contract files. If contracts live in different client folders each time, leave this unset and pass `sourcePath` or `filePaths` directly in tool calls. |
 
 ### Signer preset ("me")
 
@@ -297,6 +297,28 @@ Expected success:
 5. open the returned `editUrl` in Dropbox Sign to place signature fields
 6. send with `dropboxsign_signature_request_send_with_template`
 7. download executed files with `dropboxsign_signature_request_download`
+
+When guiding the user, explicitly mention prompt examples like:
+
+```text
+Render /absolute/path/to/contract.md to PDF
+Create an embedded template draft from /absolute/path/to/contract.md
+Send /absolute/path/to/contract.pdf for signature
+```
+
+And tool-call examples like:
+
+```json
+{
+  "sourcePath": "/absolute/path/to/contract.md"
+}
+```
+
+```json
+{
+  "filePaths": ["/absolute/path/to/contract.md"]
+}
+```
 
 ---
 

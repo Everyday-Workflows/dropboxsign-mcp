@@ -49,7 +49,7 @@ function renderMetadataTable(metadata: Record<string, unknown>): string {
   return `<section class="metadata"><h2>Document Details</h2><table>${rows}</table></section>`;
 }
 
-function preprocessObsidianCallouts(markdown: string): string {
+function preprocessCallouts(markdown: string): string {
   const lines = markdown.split('\n');
   const rendered: string[] = [];
 
@@ -146,7 +146,7 @@ interface RenderHtmlOptions {
 export function renderHtmlDocument(markdownSource: string, templateHtml: string, templateCss: string, options: RenderHtmlOptions = {}): { title: string; metadata: Record<string, unknown>; html: string } {
   const parsed = matter(markdownSource);
   const metadata = (parsed.data ?? {}) as Record<string, unknown>;
-  const markdownContent = preprocessObsidianCallouts(parsed.content);
+  const markdownContent = preprocessCallouts(parsed.content);
   const derivedHeadingTitle = extractFirstHeading(parsed.content, 1);
   const derivedSubtitle = typeof metadata.subtitle === 'string' && metadata.subtitle.length > 0
     ? metadata.subtitle

@@ -4,7 +4,7 @@ Local-only MCP server for Dropbox Sign with:
 
 - stdio transport for desktop MCP clients
 - Dropbox Sign API-key auth from your local shell environment
-- Obsidian vault contract discovery
+- local contracts directory discovery (any folder of markdown files)
 - markdown-to-branded-PDF rendering for contracts, including a cover page with logo support
 - template draft creation for branded reusable agreements
 - signature request send/list/get/download tools
@@ -15,7 +15,7 @@ Local-only MCP server for Dropbox Sign with:
 - **Transport:** stdio is the recommended fit for local MCP servers.
 - **Auth:** for opencode/local-only usage, Dropbox Sign API-key auth is the simplest and most reliable path.
 - **Branding:** Dropbox Sign applies branding via `client_id` on signature/template operations when your API app is configured for premium branding.
-- **Contracts:** markdown contracts from your Obsidian vault can be rendered locally to branded PDF before upload, eliminating browser-based markdown-to-PDF tools.
+- **Contracts:** markdown contracts from any local directory can be rendered locally to branded PDF before upload, eliminating browser-based markdown-to-PDF tools.
 
 ## Verified dependencies
 
@@ -40,7 +40,7 @@ Recommended:
 ```bash
 DROPBOXSIGN_TEST_MODE=true
 DROPBOXSIGN_CLIENT_ID=your_dropbox_sign_api_app_client_id
-DROPBOXSIGN_VAULT_PATH=/absolute/path/to/your/obsidian/vault
+DROPBOXSIGN_CONTRACTS_DIR=/absolute/path/to/your/contracts
 ```
 
 Signer preset — pre-fill your own details so you don't type them on every send:
@@ -95,7 +95,7 @@ npm start
         "DROPBOXSIGN_SIGNER_NAME": "...",
         "DROPBOXSIGN_SIGNER_EMAIL": "...",
         "DROPBOXSIGN_SIGNER_ROLE": "Service Provider",
-        "DROPBOXSIGN_VAULT_PATH": "/absolute/path/to/vault",
+        "DROPBOXSIGN_CONTRACTS_DIR": "/absolute/path/to/contracts",
         "DROPBOXSIGN_TEST_MODE": "true",
         "DROPBOXSIGN_BRAND_NAME": "My Company",
         "DROPBOXSIGN_LOGO_PATH": "/absolute/path/to/logo.webp",
@@ -185,7 +185,7 @@ If a Dropbox Sign feature is missing, treat that as "not wrapped by this MCP ser
 
 ## Contract workflow
 
-1. Find an Obsidian contract with `dropboxsign_vault_list_contracts`.
+1. Find a contract with `dropboxsign_vault_list_contracts`.
 2. Render markdown to PDF with `dropboxsign_contract_render_pdf`.
 3. Either:
    - send it directly with `dropboxsign_signature_request_send`, or

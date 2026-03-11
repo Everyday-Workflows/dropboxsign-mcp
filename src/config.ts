@@ -7,7 +7,7 @@ export const APP_NAME = 'dropboxsign-mcp';
 
 export interface AppConfig {
   appName: string;
-  vaultPath?: string;
+  contractsDir?: string;
   downloadsDir: string;
   generatedDir: string;
   templatesDir: string;
@@ -27,9 +27,10 @@ export interface AppConfig {
   };
 }
 
-function resolveDefaultVaultPath(): string | undefined {
-  if (process.env.DROPBOXSIGN_VAULT_PATH) {
-    return path.resolve(process.env.DROPBOXSIGN_VAULT_PATH);
+function resolveContractsDir(): string | undefined {
+  const value = process.env.DROPBOXSIGN_CONTRACTS_DIR ?? process.env.DROPBOXSIGN_VAULT_PATH;
+  if (value) {
+    return path.resolve(value);
   }
 
   return undefined;
@@ -48,7 +49,7 @@ export function getConfig(): AppConfig {
 
   return {
     appName: APP_NAME,
-    vaultPath: resolveDefaultVaultPath(),
+    contractsDir: resolveContractsDir(),
     downloadsDir: path.resolve(
       process.env.DROPBOXSIGN_DOWNLOAD_DIR ?? path.join(homeDirectory, '.local', 'share', APP_NAME, 'downloads'),
     ),

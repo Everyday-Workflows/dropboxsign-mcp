@@ -71,7 +71,7 @@ export async function startServer(dependencies: {
           email: config.signer.email ?? '(not set)',
           role: config.signer.role,
         },
-        vaultPath: config.vaultPath ?? '(not set)',
+        contractsDir: config.contractsDir ?? '(not set)',
         downloadsDir: config.downloadsDir,
         generatedDir: config.generatedDir,
         templatesDir: config.templatesDir,
@@ -102,10 +102,10 @@ export async function startServer(dependencies: {
   server.registerTool(
     'dropboxsign_vault_list_contracts',
     {
-      title: 'List vault contracts',
-      description: 'Lists contract markdown files discovered in the configured Obsidian vault.',
+      title: 'List contracts',
+      description: 'Lists markdown contract files discovered in the configured contracts directory.',
       inputSchema: {
-        query: z.string().optional().describe('Optional case-insensitive filter applied to the vault contract path.'),
+        query: z.string().optional().describe('Optional case-insensitive filter applied to the contract path.'),
         limit: z.number().int().min(1).max(100).default(25).describe('Maximum number of results to return.'),
       },
       annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
@@ -120,7 +120,7 @@ export async function startServer(dependencies: {
     'dropboxsign_contract_render_pdf',
     {
       title: 'Render markdown contract to PDF',
-      description: 'Renders a local markdown contract (including Obsidian vault notes) to branded HTML and PDF for Dropbox Sign upload.',
+      description: 'Renders a local markdown contract to branded HTML and PDF for Dropbox Sign upload.',
       inputSchema: z.object({
         sourcePath: z.string().describe('Absolute or allowed local path to a markdown contract file.'),
         templateName: z.string().default('default').describe('Brand template basename in the templates directory, without the .html/.css extension.'),

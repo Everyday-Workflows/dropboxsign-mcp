@@ -17,8 +17,8 @@ export class FileSystemService {
 
   public resolveReadablePath(inputPath: string): string {
     const allowedRoots = [process.cwd(), this.config.generatedDir, this.config.downloadsDir];
-    if (this.config.vaultPath) {
-      allowedRoots.push(this.config.vaultPath);
+    if (this.config.contractsDir) {
+      allowedRoots.push(this.config.contractsDir);
     }
     if (this.config.branding.logoPath) {
       allowedRoots.push(path.dirname(this.config.branding.logoPath));

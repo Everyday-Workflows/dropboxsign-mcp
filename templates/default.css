@@ -327,6 +327,7 @@ code {
   .cover-page-inner {
     min-height: 11in;
     padding: 0.72in 0.65in 0.72in;
+    position: relative;
   }
 
   .cover-page {
@@ -334,17 +335,18 @@ code {
   }
 
   .cover-hero {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 0.42in;
-    margin-top: 0.28in;
+    display: block;
+    position: relative;
+    min-height: 8.45in;
+    margin-top: 0.12in;
   }
 
   .cover-copy {
-    flex: 1 1 auto;
+    position: absolute;
+    left: 0;
+    bottom: 0;
     max-width: none;
-    width: calc(100% - 3.05in);
+    width: 3.72in;
     padding-right: 0;
   }
 
@@ -359,8 +361,10 @@ code {
   }
 
   .cover-panel {
-    flex: 0 0 2.63in;
-    width: 2.63in;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 2.58in;
     padding: 0.8rem;
     break-inside: avoid;
     page-break-inside: avoid;

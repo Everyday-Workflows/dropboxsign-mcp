@@ -275,7 +275,7 @@ After changing env vars or MCP config, always restart OpenCode or Claude Desktop
 Run these tools in order:
 
 1. `dropboxsign_auth_status` — confirms API key, client ID, signer preset, and paths
-2. `dropboxsign_vault_list_contracts` — lists markdown contracts in your contracts directory
+2. `dropboxsign_list_contracts` — lists markdown contracts in your contracts directory
 3. `dropboxsign_template_list` — lists existing Dropbox Sign templates
 4. `dropboxsign_signature_request_list` — lists existing signature requests
 
@@ -290,7 +290,7 @@ Expected success:
 
 ## First useful workflow
 
-1. if you have a stable contracts root, find a contract with `dropboxsign_vault_list_contracts`
+1. if you have a stable contracts root, find a contract with `dropboxsign_list_contracts`
 2. otherwise, skip listing and pass an absolute markdown `sourcePath` directly to `dropboxsign_contract_render_pdf`
 3. render it with `dropboxsign_contract_render_pdf`
 4. create an embedded template draft with `dropboxsign_template_create_embedded_draft`

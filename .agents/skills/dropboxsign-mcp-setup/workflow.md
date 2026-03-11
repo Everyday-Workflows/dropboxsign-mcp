@@ -16,7 +16,7 @@
 
 ```text
 dropboxsign_auth_status
-dropboxsign_vault_list_contracts
+dropboxsign_list_contracts   # optional, only if DROPBOXSIGN_CONTRACTS_DIR is set
 dropboxsign_contract_render_pdf
 dropboxsign_template_list
 dropboxsign_signature_request_list

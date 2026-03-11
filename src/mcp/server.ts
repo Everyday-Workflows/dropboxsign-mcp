@@ -100,7 +100,7 @@ export async function startServer(dependencies: {
   );
 
   server.registerTool(
-    'dropboxsign_vault_list_contracts',
+    'dropboxsign_list_contracts',
     {
       title: 'List contracts',
       description: 'Lists markdown contract files discovered in the configured contracts directory.',

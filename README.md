@@ -242,7 +242,7 @@ npm start
 
 - `dropboxsign_auth_status`
 - `dropboxsign_verify_account`
-- `dropboxsign_vault_list_contracts`
+- `dropboxsign_list_contracts`
 - `dropboxsign_contract_render_pdf`
 - `dropboxsign_template_list`
 - `dropboxsign_template_get`
@@ -316,14 +316,13 @@ If a Dropbox Sign feature is missing, treat that as "not wrapped by this MCP ser
 
 ## Contract workflow
 
-1. Find a contract with `dropboxsign_vault_list_contracts`.
-2. Render markdown to PDF with `dropboxsign_contract_render_pdf`.
-3. Either:
+1. If you configured `DROPBOXSIGN_CONTRACTS_DIR`, find a contract with `dropboxsign_list_contracts`.
+2. Otherwise, skip listing and pass the absolute contract path directly to `dropboxsign_contract_render_pdf` or `dropboxsign_signature_request_send`.
+3. Render markdown to PDF with `dropboxsign_contract_render_pdf`.
+4. Either:
    - send it directly with `dropboxsign_signature_request_send`, or
    - create a reusable template draft with `dropboxsign_template_create_embedded_draft` and place fields in Dropbox Sign’s embedded editor.
-4. Download executed files locally with `dropboxsign_signature_request_download`.
-
-If you do not use `DROPBOXSIGN_CONTRACTS_DIR`, skip contract listing and pass the absolute contract path directly in `sourcePath` or `filePaths`.
+5. Download executed files locally with `dropboxsign_signature_request_download`.
 
 The default template now renders a dedicated branded cover page on page 1 and starts the contract body on page 2.
 

@@ -4,7 +4,7 @@ subtitle: Website analytics and reporting implementation
 client: Northwind Trail Outfitters
 project: GA4 + Search Console Visibility Program
 effective_date: April 1, 2026
-service_provider: Evergreen Studio LLC
+service_provider: Everyday Workflows
 status: sample
 ---
 
@@ -17,11 +17,11 @@ status: sample
 **Client:** Northwind Trail Outfitters  
 **Project:** GA4 + Search Console Visibility Program  
 **Effective Date:** April 1, 2026  
-**Service Provider:** Evergreen Studio LLC
+**Service Provider:** Everyday Workflows
 
 ## 1. Scope of Services
 
-Evergreen Studio LLC will configure and deliver the following work for Northwind Trail Outfitters:
+Everyday Workflows will configure and deliver the following work for Northwind Trail Outfitters:
 
 - Google Analytics 4 property review and event mapping
 - Google Search Console verification and sitemap review
@@ -75,5 +75,5 @@ By signing, both parties agree to the terms of this Mock Service Agreement.
 **Client:** Northwind Trail Outfitters  
 **Authorized Signer:** Jordan Hale  
 
-**Service Provider:** Evergreen Studio LLC  
+**Service Provider:** Everyday Workflows  
 **Authorized Signer:** Riley Mercer

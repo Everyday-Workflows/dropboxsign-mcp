@@ -27,26 +27,39 @@ Local-only MCP server for Dropbox Sign with:
 
 ## Environment
 
-Create a local `.env` or otherwise export these variables before running:
+Copy `.env.example` to `.env` and fill in your values, or export them in your shell. See `.env.example` for the full list with comments.
+
+Required:
 
 ```bash
 DROPBOXSIGN_API_KEY=your_dropbox_sign_api_key
-DROPBOXSIGN_VAULT_PATH=/home/alexd/Everyday-Workflows-Brain
-DROPBOXSIGN_TEST_MODE=true
 ```
 
-Optional:
+Recommended:
 
 ```bash
+DROPBOXSIGN_TEST_MODE=true
 DROPBOXSIGN_CLIENT_ID=your_dropbox_sign_api_app_client_id
-DROPBOXSIGN_BRAND_NAME=Everyday Workflows
-DROPBOXSIGN_LOGO_PATH=/absolute/path/to/your/logo.webp
-DROPBOXSIGN_DOWNLOAD_DIR=/custom/downloads/path
-DROPBOXSIGN_GENERATED_DIR=/custom/generated/path
-DROPBOXSIGN_TEMPLATE_DIR=/custom/template/path
+DROPBOXSIGN_VAULT_PATH=/absolute/path/to/your/obsidian/vault
 ```
 
-On Alex's machine, the renderer auto-detects `/home/alexd/Pictures/EVERYDAY WORKFLOWS/webp/horizontallogo.webp` if no `DROPBOXSIGN_LOGO_PATH` is set.
+Signer preset — pre-fill your own details so you don't type them on every send:
+
+```bash
+DROPBOXSIGN_SIGNER_NAME=Your Name
+DROPBOXSIGN_SIGNER_EMAIL=you@example.com
+DROPBOXSIGN_SIGNER_ROLE=Service Provider
+```
+
+Optional branding and output:
+
+```bash
+DROPBOXSIGN_BRAND_NAME=My Company
+DROPBOXSIGN_LOGO_PATH=/absolute/path/to/your/logo.webp
+DROPBOXSIGN_GENERATED_DIR=/absolute/path/to/generated
+DROPBOXSIGN_DOWNLOAD_DIR=/absolute/path/to/downloads
+DROPBOXSIGN_TEMPLATE_DIR=/absolute/path/to/templates
+```
 
 ## Install
 
@@ -79,8 +92,15 @@ npm start
       "env": {
         "DROPBOXSIGN_API_KEY": "...",
         "DROPBOXSIGN_CLIENT_ID": "...",
-        "DROPBOXSIGN_VAULT_PATH": "/home/alexd/Everyday-Workflows-Brain",
-        "DROPBOXSIGN_TEST_MODE": "true"
+        "DROPBOXSIGN_SIGNER_NAME": "...",
+        "DROPBOXSIGN_SIGNER_EMAIL": "...",
+        "DROPBOXSIGN_SIGNER_ROLE": "Service Provider",
+        "DROPBOXSIGN_VAULT_PATH": "/absolute/path/to/vault",
+        "DROPBOXSIGN_TEST_MODE": "true",
+        "DROPBOXSIGN_BRAND_NAME": "My Company",
+        "DROPBOXSIGN_LOGO_PATH": "/absolute/path/to/logo.webp",
+        "DROPBOXSIGN_GENERATED_DIR": "/absolute/path/to/generated",
+        "DROPBOXSIGN_DOWNLOAD_DIR": "/absolute/path/to/downloads"
       }
     }
   }
@@ -100,6 +120,9 @@ npm start
 - `dropboxsign_signature_request_send_with_template`
 - `dropboxsign_signature_request_list`
 - `dropboxsign_signature_request_get`
+- `dropboxsign_signature_request_cancel`
+- `dropboxsign_signature_request_remind`
+- `dropboxsign_signature_request_update_signer`
 - `dropboxsign_signature_request_download`
 - `dropboxsign_template_download`
 

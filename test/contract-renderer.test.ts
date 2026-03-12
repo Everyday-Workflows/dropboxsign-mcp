@@ -5,7 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 
 import type { AppConfig } from '../src/config.js';
-import { ContractRenderer, renderHtmlDocument } from '../src/contracts/renderer.js';
+import { ContractRenderer, getRasterizedCoverPagePrintStyles, renderHtmlDocument } from '../src/contracts/renderer.js';
 import { FileSystemService } from '../src/storage/file-system.js';
 
 const templateHtml = '<html><head><style>/*STYLE*/</style><title><!--TITLE--></title></head><body><section><!--COVER_LOGO--><div><!--BRAND_NAME--></div><h1><!--TITLE--></h1><p><!--COVER_SUBTITLE--></p><!--COVER_FACTS--></section><!--SUMMARY--><article><!--BODY--></article></body></html>';
@@ -128,4 +128,12 @@ test('bundled print stylesheet uses a PDF-safe cover layout fallback', async () 
     stylesheet,
     /@media print\s*\{[\s\S]*?\.cover-panel\s*\{[\s\S]*?-webkit-backdrop-filter:\s*none;/,
   );
+});
+
+test('rasterized cover print styles preserve exact page placement', () => {
+  const styles = getRasterizedCoverPagePrintStyles();
+
+  assert.match(styles, /\.cover-page\.cover-page-rasterized > \.cover-page-raster\s*\{[\s\S]*?object-fit:\s*fill\s*!important;/);
+  assert.match(styles, /\.cover-page\.cover-page-rasterized > \.cover-page-raster\s*\{[\s\S]*?object-position:\s*top left\s*!important;/);
+  assert.doesNotMatch(styles, /object-fit:\s*cover\s*!important/);
 });

@@ -239,6 +239,29 @@ function getMimeType(filePath: string): string {
   }
 }
 
+export function getRasterizedCoverPagePrintStyles(): string {
+  return `
+    @media print {
+      .cover-page.cover-page-rasterized {
+        padding: 0 !important;
+        min-height: 11in !important;
+        height: 11in !important;
+        overflow: hidden !important;
+        break-after: page !important;
+        page-break-after: always !important;
+      }
+
+      .cover-page.cover-page-rasterized > .cover-page-raster {
+        display: block !important;
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: fill !important;
+        object-position: top left !important;
+      }
+    }
+  `;
+}
+
 export class ContractRenderer {
   public constructor(
     private readonly config: AppConfig,
@@ -316,25 +339,7 @@ export class ContractRenderer {
     const coverImageDataUri = `data:image/png;base64,${coverImageBuffer.toString('base64')}`;
 
     await page.addStyleTag({
-      content: `
-        @media print {
-          .cover-page.cover-page-rasterized {
-            padding: 0 !important;
-            min-height: 11in !important;
-            height: 11in !important;
-            overflow: hidden !important;
-            break-after: page !important;
-            page-break-after: always !important;
-          }
-
-          .cover-page.cover-page-rasterized > .cover-page-raster {
-            display: block !important;
-            width: 100% !important;
-            height: 100% !important;
-            object-fit: cover !important;
-          }
-        }
-      `,
+      content: getRasterizedCoverPagePrintStyles(),
     });
 
     await page.evaluate((dataUri) => {

@@ -3,29 +3,18 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-export const APP_NAME = 'dropboxsign-mcp';
+export const APP_NAME = 'contract-pdf-mcp';
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
 
 export interface AppConfig {
   appName: string;
   contractsDir?: string;
-  downloadsDir: string;
   generatedDir: string;
   templatesDir: string;
   templatesDirConfigured: boolean;
   branding: {
     name: string;
     logoPath?: string;
-  };
-  dropboxSign: {
-    apiKey?: string;
-    clientId?: string;
-    testMode: boolean;
-  };
-  signer: {
-    name?: string;
-    email?: string;
-    role: string;
   };
 }
 
@@ -61,7 +50,7 @@ function normalizeConfiguredFilesystemPath(value: string): string {
 }
 
 function resolveContractsDir(): string | undefined {
-  const value = process.env.DROPBOXSIGN_CONTRACTS_DIR ?? process.env.DROPBOXSIGN_VAULT_PATH;
+  const value = process.env.CONTRACT_PDF_CONTRACTS_DIR;
   if (value) {
     return path.resolve(value);
   }
@@ -70,8 +59,8 @@ function resolveContractsDir(): string | undefined {
 }
 
 function resolveDefaultLogoPath(): string | undefined {
-  if (process.env.DROPBOXSIGN_LOGO_PATH) {
-    return path.resolve(normalizeConfiguredFilesystemPath(process.env.DROPBOXSIGN_LOGO_PATH));
+  if (process.env.CONTRACT_PDF_LOGO_PATH) {
+    return path.resolve(normalizeConfiguredFilesystemPath(process.env.CONTRACT_PDF_LOGO_PATH));
   }
 
   return undefined;
@@ -88,7 +77,7 @@ function resolveBundledTemplatesDir(): string {
 }
 
 function resolveTemplatesDir(): { templatesDir: string; templatesDirConfigured: boolean } {
-  const configuredTemplatesDir = process.env.DROPBOXSIGN_TEMPLATE_DIR;
+  const configuredTemplatesDir = process.env.CONTRACT_PDF_TEMPLATE_DIR;
 
   if (configuredTemplatesDir) {
     return {
@@ -110,27 +99,14 @@ export function getConfig(): AppConfig {
   return {
     appName: APP_NAME,
     contractsDir: resolveContractsDir(),
-    downloadsDir: path.resolve(
-      process.env.DROPBOXSIGN_DOWNLOAD_DIR ?? path.join(homeDirectory, '.local', 'share', APP_NAME, 'downloads'),
-    ),
     generatedDir: path.resolve(
-      process.env.DROPBOXSIGN_GENERATED_DIR ?? path.join(homeDirectory, '.local', 'share', APP_NAME, 'generated'),
+      process.env.CONTRACT_PDF_GENERATED_DIR ?? path.join(homeDirectory, '.local', 'share', APP_NAME, 'generated'),
     ),
     templatesDir,
     templatesDirConfigured,
     branding: {
-      name: process.env.DROPBOXSIGN_BRAND_NAME ?? 'My Company',
+      name: process.env.CONTRACT_PDF_BRAND_NAME ?? 'My Company',
       logoPath: resolveDefaultLogoPath(),
-    },
-    dropboxSign: {
-      apiKey: process.env.DROPBOXSIGN_API_KEY,
-      clientId: process.env.DROPBOXSIGN_CLIENT_ID,
-      testMode: process.env.DROPBOXSIGN_TEST_MODE === 'true',
-    },
-    signer: {
-      name: process.env.DROPBOXSIGN_SIGNER_NAME,
-      email: process.env.DROPBOXSIGN_SIGNER_EMAIL,
-      role: process.env.DROPBOXSIGN_SIGNER_ROLE ?? 'Service Provider',
     },
   };
 }

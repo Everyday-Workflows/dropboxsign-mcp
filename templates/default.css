@@ -94,16 +94,18 @@ body {
 }
 
 .cover-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(2.35in, 0.95fr);
-  gap: 1rem;
-  align-items: end;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.2rem;
   margin-top: 0.35in;
+  min-height: 6.85in;
 }
 
 .cover-copy {
-  max-width: 4.85in;
-  padding-right: 0.35in;
+  max-width: 5in;
+  padding-right: 0;
 }
 
 .document-shell {
@@ -169,6 +171,9 @@ h3 {
   background: var(--surface-elevated);
   border: 1px solid rgba(23, 92, 211, 0.12);
   border-radius: 24px;
+  width: min(100%, 2.82in);
+  margin-left: 0;
+  margin-right: auto;
   padding: 1rem;
   box-shadow:
     0 1px 1px rgba(15, 23, 42, 0.02),
@@ -332,15 +337,7 @@ code {
     -webkit-print-color-adjust: exact;
   }
 
-  .cover-page {
-    display: block;
-    min-height: 11in;
-    height: 11in;
-    overflow: hidden;
-  }
-
   .cover-page-inner {
-    display: block;
     height: 11in;
     min-height: unset;
     max-width: none;
@@ -348,26 +345,32 @@ code {
     position: relative;
   }
 
+  .cover-page {
+    display: block;
+    min-height: 11in;
+    height: 11in;
+    overflow: hidden;
+  }
+
   .cover-topbar {
     display: block;
     min-height: 0.9in;
   }
 
-  /* Chromium's PDF compositor is more reliable here with explicit absolute
-     positioning than flex/grid/table layout on the first page. */
   .cover-hero {
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
     margin-top: 0.12in;
     min-height: calc(11in - 0.72in - 0.72in - 1.02in);
   }
 
   .cover-copy {
-    position: absolute;
-    left: 0;
-    right: 3.06in;
-    bottom: 0;
+    position: static;
     max-width: none;
-    padding-right: 0.48in;
+    width: 4.95in;
+    padding-right: 0;
   }
 
   .cover-title {
@@ -381,11 +384,12 @@ code {
   }
 
   .cover-panel {
-    position: absolute;
-    top: 0;
-    right: 0;
+    position: static;
     display: block;
-    width: 2.58in;
+    width: 2.82in;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: auto;
     padding: 0.8rem;
     background: #ffffff;
     box-shadow:

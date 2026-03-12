@@ -21,16 +21,16 @@ When reporting, include:
 - impact and affected workflow
 - reproduction steps or a minimal proof of concept
 - any relevant configuration details
-- whether real secrets, contracts, or signed files were involved
+- whether real secrets, contracts, or rendered files were involved
 
 ## What to avoid posting publicly
 
 Do not include any of the following in public issues, PRs, or screenshots:
 
-- `DROPBOXSIGN_API_KEY`
+- local secrets or API keys from any downstream signing provider
 - customer or signer PII
 - private contract contents
-- signed document files
+- rendered or signed document files
 - internal filesystem paths you do not want exposed
 
 ## Likely high-priority report areas

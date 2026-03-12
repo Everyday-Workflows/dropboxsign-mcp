@@ -1,29 +1,25 @@
 {
-  "name": "@alexautomates/dropboxsign-mcp",
-  "version": "0.1.9",
+  "name": "@alexautomates/contract-pdf-mcp",
+  "version": "0.2.0",
   "type": "module",
-  "description": "Local-first MCP server for Dropbox Sign: render branded contract PDFs, create template drafts, and send/manage signature requests.",
+  "private": true,
+  "description": "Local-first MCP server for rendering branded contract PDFs from markdown and reusable HTML/CSS templates.",
   "license": "MIT",
-  "homepage": "https://github.com/Everyday-Workflows/dropboxsign-mcp#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Everyday-Workflows/dropboxsign-mcp.git"
   },
-  "bugs": {
-    "url": "https://github.com/Everyday-Workflows/dropboxsign-mcp/issues"
-  },
   "keywords": [
     "mcp",
     "model-context-protocol",
-    "dropbox-sign",
-    "hellosign",
-    "esignature",
     "contracts",
+    "pdf",
+    "templates",
     "document-automation",
     "typescript"
   ],
   "bin": {
-    "dropboxsign-mcp": "bin/dropboxsign-mcp.js"
+    "contract-pdf-mcp": "bin/contract-pdf-mcp.js"
   },
   "files": [
     "bin",
@@ -34,9 +30,6 @@
   "engines": {
     "node": ">=20"
   },
-  "publishConfig": {
-    "access": "public"
-  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dev": "tsx src/index.ts",
@@ -46,7 +39,6 @@
     "test": "tsx --test test/*.test.ts"
   },
   "dependencies": {
-    "@dropbox/sign": "^1.10.0",
     "@modelcontextprotocol/sdk": "^1.27.1",
     "gray-matter": "^4.0.3",
     "markdown-it": "^14.1.1",

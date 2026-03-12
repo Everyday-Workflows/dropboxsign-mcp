@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for contributing to `dropboxsign-mcp`.
+Thanks for contributing to `contract-pdf-mcp`.
 
 ## Development setup
 
@@ -12,8 +12,8 @@ npx playwright install chromium
 Recommended local env while developing:
 
 ```bash
-DROPBOXSIGN_TEST_MODE=true
-DROPBOXSIGN_API_KEY=your_test_api_key
+CONTRACT_PDF_TEMPLATE_DIR=/absolute/path/to/templates
+CONTRACT_PDF_GENERATED_DIR=/absolute/path/to/generated
 ```
 
 You can copy values from [`.env.example`](.env.example) or export them in your shell.
@@ -46,15 +46,14 @@ npm pack
 
 - Prefer focused PRs over broad refactors.
 - Keep new MCP tools aligned with the current local-first design.
-- If you add or remove Dropbox Sign functionality, update `README.md` so the supported surface stays accurate.
+- If you add or remove local rendering functionality, update `README.md` so the supported surface stays accurate.
 - If you change environment variables or defaults, update both `README.md` and `.env.example`.
 - If you add rendered output behavior, include or update tests where practical.
 
 ## Secrets and sample data
 
-- Never commit `.env` files, API keys, customer contracts, or signed documents.
+- Never commit `.env` files, secrets, customer contracts, or rendered documents.
 - Use fictional sample data for screenshots, tests, and docs.
-- Prefer Dropbox Sign test mode for development and demos.
 
 ## Issues and pull requests
 

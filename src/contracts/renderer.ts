@@ -1,4 +1,4 @@
-import { access, readFile } from 'node:fs/promises';
+import { access, readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 
 import matter from 'gray-matter';
@@ -199,7 +199,7 @@ export function renderHtmlDocument(markdownSource: string, templateHtml: string,
       ? formatDisplayText(derivedHeadingTitle)
       : options.sourcePath
         ? formatDisplayText(path.basename(options.sourcePath, path.extname(options.sourcePath)))
-        : 'Dropbox Sign Contract';
+        : 'Contract Document';
   const brandName = options.brandName ?? 'Everyday Workflows';
 
   const renderer = createMarkdownRenderer();
@@ -292,7 +292,7 @@ export class ContractRenderer {
       const nodeError = error as NodeJS.ErrnoException;
       if (nodeError.code === 'ENOENT') {
         throw new Error(
-          `Template "${templateName}" could not be loaded from ${this.config.templatesDir}. Expected files: ${path.basename(templateHtmlPath)} and ${path.basename(templateCssPath)}. ${this.config.templatesDirConfigured ? 'Check DROPBOXSIGN_TEMPLATE_DIR and make sure it points to the directory that contains your contract template files.' : 'Set DROPBOXSIGN_TEMPLATE_DIR to an absolute directory containing your contract template files if you want to override the bundled defaults.'}`,
+          `Template "${templateName}" could not be loaded from ${this.config.templatesDir}. Expected files: ${path.basename(templateHtmlPath)} and ${path.basename(templateCssPath)}. ${this.config.templatesDirConfigured ? 'Check CONTRACT_PDF_TEMPLATE_DIR and make sure it points to the directory that contains your contract template files.' : 'Set CONTRACT_PDF_TEMPLATE_DIR to an absolute directory containing your contract template files if you want to override the bundled defaults.'}`,
         );
       }
 
@@ -320,23 +320,47 @@ export class ContractRenderer {
     }
 
     const recoveryHint = this.config.templatesDirConfigured
-      ? 'Check DROPBOXSIGN_TEMPLATE_DIR and make sure it points to a directory that contains at least default.html and default.css.'
-      : 'The bundled default templates could not be found. Reinstall the package or set DROPBOXSIGN_TEMPLATE_DIR to an absolute directory that contains at least default.html and default.css.';
+      ? 'Check CONTRACT_PDF_TEMPLATE_DIR and make sure it points to a directory that contains at least default.html and default.css.'
+      : 'The bundled default templates could not be found. Reinstall the package or set CONTRACT_PDF_TEMPLATE_DIR to an absolute directory that contains at least default.html and default.css.';
 
     throw new Error(
       `Missing required contract template file(s) in ${this.config.templatesDir}: ${missingFiles.join(', ')}. ${recoveryHint}`,
     );
   }
 
-  private async rasterizeCoverPageForPdf(page: Page): Promise<void> {
+  public async listTemplates(): Promise<Array<{ name: string; htmlPath: string; cssPath: string }>> {
+    const entries = await readdir(this.config.templatesDir, { withFileTypes: true });
+    const names = new Set(
+      entries
+        .filter((entry) => entry.isFile() && entry.name.endsWith('.html'))
+        .map((entry) => path.basename(entry.name, '.html')),
+    );
+
+    return [...names]
+      .filter((name) => entries.some((entry) => entry.isFile() && entry.name === `${name}.css`))
+      .sort((left, right) => left.localeCompare(right))
+      .map((name) => ({
+        name,
+        htmlPath: path.join(this.config.templatesDir, `${name}.html`),
+        cssPath: path.join(this.config.templatesDir, `${name}.css`),
+      }));
+  }
+
+  private async captureCoverPageRasterDataUri(page: Page): Promise<string | null> {
     const coverPage = page.locator('.cover-page').first();
 
     if (await coverPage.count() === 0) {
-      return;
+      return null;
     }
 
     const coverImageBuffer = await coverPage.screenshot({ type: 'png' });
-    const coverImageDataUri = `data:image/png;base64,${coverImageBuffer.toString('base64')}`;
+    return `data:image/png;base64,${coverImageBuffer.toString('base64')}`;
+  }
+
+  private async rasterizeCoverPageForPdf(page: Page, coverImageDataUri: string | null): Promise<void> {
+    if (!coverImageDataUri) {
+      return;
+    }
 
     await page.addStyleTag({
       content: getRasterizedCoverPagePrintStyles(),
@@ -404,13 +428,14 @@ export class ContractRenderer {
         deviceScaleFactor: 2,
       });
       await page.setContent(document.html, { waitUntil: 'networkidle' });
+      const coverImageDataUri = await this.captureCoverPageRasterDataUri(page);
       // emulateMedia must be called before pdf() so @media print rules apply
       // during layout — Chromium's PDF compositor uses these for final output.
       await page.emulateMedia({ media: 'print' });
       // Give the compositor a moment to fully settle after media change;
       // this reduces the chance of the first-page cover layout being clipped.
       await page.waitForTimeout(120);
-      await this.rasterizeCoverPageForPdf(page);
+      await this.rasterizeCoverPageForPdf(page, coverImageDataUri);
       await page.pdf({
         path: pdfPath,
         format: 'Letter',

@@ -12,19 +12,12 @@ const templateHtml = '<html><head><style>/*STYLE*/</style><title><!--TITLE--></t
 
 function createTestConfig(templatesDir: string, templatesDirConfigured: boolean): AppConfig {
   return {
-    appName: 'dropboxsign-mcp',
-    downloadsDir: templatesDir,
+    appName: 'contract-pdf-mcp',
     generatedDir: templatesDir,
     templatesDir,
     templatesDirConfigured,
     branding: {
       name: 'Everyday Workflows',
-    },
-    dropboxSign: {
-      testMode: true,
-    },
-    signer: {
-      role: 'Service Provider',
     },
   };
 }
@@ -74,7 +67,7 @@ service_provider: everyday_workflows
 });
 
 test('validateDefaultTemplateAssets throws a clear error when default template files are missing from an explicit template directory', async () => {
-  const templatesDir = await mkdtemp(path.join(os.tmpdir(), 'dropboxsign-templates-'));
+  const templatesDir = await mkdtemp(path.join(os.tmpdir(), 'contract-pdf-templates-'));
 
   try {
     const config = createTestConfig(templatesDir, true);
@@ -82,7 +75,7 @@ test('validateDefaultTemplateAssets throws a clear error when default template f
 
     await assert.rejects(
       renderer.validateDefaultTemplateAssets(),
-      /Missing required contract template file\(s\).*default\.html.*default\.css.*DROPBOXSIGN_TEMPLATE_DIR/,
+      /Missing required contract template file\(s\).*default\.html.*default\.css.*CONTRACT_PDF_TEMPLATE_DIR/,
     );
   } finally {
     await rm(templatesDir, { recursive: true, force: true });
@@ -90,7 +83,7 @@ test('validateDefaultTemplateAssets throws a clear error when default template f
 });
 
 test('validateDefaultTemplateAssets succeeds when default template files are present', async () => {
-  const templatesDir = await mkdtemp(path.join(os.tmpdir(), 'dropboxsign-templates-'));
+  const templatesDir = await mkdtemp(path.join(os.tmpdir(), 'contract-pdf-templates-'));
 
   try {
     await writeFile(path.join(templatesDir, 'default.html'), '<html><body><!--BODY--></body></html>', 'utf8');
@@ -110,15 +103,27 @@ test('bundled print stylesheet uses a PDF-safe cover layout fallback', async () 
 
   assert.match(
     stylesheet,
-    /@media print\s*\{[\s\S]*?\.cover-hero\s*\{[\s\S]*?position:\s*relative;/,
+    /@media print\s*\{[\s\S]*?\.cover-hero\s*\{[\s\S]*?display:\s*flex;/,
   );
   assert.match(
     stylesheet,
-    /@media print\s*\{[\s\S]*?\.cover-copy\s*\{[\s\S]*?position:\s*absolute;/,
+    /@media print\s*\{[\s\S]*?\.cover-hero\s*\{[\s\S]*?flex-direction:\s*column;/,
   );
   assert.match(
     stylesheet,
-    /@media print\s*\{[\s\S]*?\.cover-panel\s*\{[\s\S]*?position:\s*absolute;/,
+    /@media print\s*\{[\s\S]*?\.cover-hero\s*\{[\s\S]*?justify-content:\s*space-between;/,
+  );
+  assert.match(
+    stylesheet,
+    /@media print\s*\{[\s\S]*?\.cover-panel\s*\{[\s\S]*?position:\s*static;/,
+  );
+  assert.match(
+    stylesheet,
+    /@media print\s*\{[\s\S]*?\.cover-panel\s*\{[\s\S]*?margin-left:\s*0;/,
+  );
+  assert.match(
+    stylesheet,
+    /@media print\s*\{[\s\S]*?\.cover-panel\s*\{[\s\S]*?margin-right:\s*auto;/,
   );
   assert.match(
     stylesheet,

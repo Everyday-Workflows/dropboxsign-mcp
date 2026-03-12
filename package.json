@@ -1,6 +1,6 @@
 {
   "name": "@alexautomates/dropboxsign-mcp",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "type": "module",
   "description": "Local-first MCP server for Dropbox Sign: render branded contract PDFs, create template drafts, and send/manage signature requests.",
   "license": "MIT",

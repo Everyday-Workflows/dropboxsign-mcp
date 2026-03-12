@@ -174,6 +174,7 @@ h3 {
     0 1px 1px rgba(15, 23, 42, 0.02),
     0 10px 30px rgba(23, 92, 211, 0.08);
   backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 .cover-panel-label {
@@ -324,39 +325,49 @@ code {
     background: #ffffff;
   }
 
+  .cover-page,
+  .cover-panel,
+  .cover-fact {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
   .cover-page {
+    display: block;
     min-height: 11in;
     height: 11in;
     overflow: hidden;
   }
 
   .cover-page-inner {
+    display: block;
     height: 11in;
     min-height: unset;
+    max-width: none;
     padding: 0.72in 0.65in 0.72in;
     position: relative;
   }
 
-  /* Use a stable two-column grid — Chromium PDF compositor honours grid
-     reliably; absolute positioning on the first page is frequently dropped. */
+  .cover-topbar {
+    display: block;
+    min-height: 0.9in;
+  }
+
+  /* Chromium's PDF compositor is more reliable here with explicit absolute
+     positioning than flex/grid/table layout on the first page. */
   .cover-hero {
-    display: grid;
-    grid-template-columns: 1fr 2.65in;
-    grid-template-rows: 1fr;
-    column-gap: 0.48in;
-    align-items: end;
-    flex: 1;
+    position: relative;
     margin-top: 0.12in;
-    /* Fill the remaining vertical space inside the page */
-    min-height: calc(11in - 0.72in - 0.72in - 0.9in); /* page - top pad - bot pad - topbar */
+    min-height: calc(11in - 0.72in - 0.72in - 1.02in);
   }
 
   .cover-copy {
-    grid-column: 1;
-    grid-row: 1;
+    position: absolute;
+    left: 0;
+    right: 3.06in;
+    bottom: 0;
     max-width: none;
-    padding-right: 0;
-    align-self: end;
+    padding-right: 0.48in;
   }
 
   .cover-title {
@@ -369,15 +380,20 @@ code {
     font-size: 13.5pt;
   }
 
-  /* Panel is column 2, anchored to the top of the grid row */
   .cover-panel {
-    grid-column: 2;
-    grid-row: 1;
-    align-self: start;
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: block;
     width: 2.58in;
     padding: 0.8rem;
-    break-inside: avoid;
-    page-break-inside: avoid;
+    background: #ffffff;
+    box-shadow:
+      0 1px 1px rgba(15, 23, 42, 0.02),
+      0 8px 22px rgba(23, 92, 211, 0.06);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    isolation: isolate;
   }
 
   .cover-facts {

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
@@ -103,4 +103,29 @@ test('validateDefaultTemplateAssets succeeds when default template files are pre
   } finally {
     await rm(templatesDir, { recursive: true, force: true });
   }
+});
+
+test('bundled print stylesheet uses a PDF-safe cover layout fallback', async () => {
+  const stylesheet = await readFile(new URL('../templates/default.css', import.meta.url), 'utf8');
+
+  assert.match(
+    stylesheet,
+    /@media print\s*\{[\s\S]*?\.cover-hero\s*\{[\s\S]*?position:\s*relative;/,
+  );
+  assert.match(
+    stylesheet,
+    /@media print\s*\{[\s\S]*?\.cover-copy\s*\{[\s\S]*?position:\s*absolute;/,
+  );
+  assert.match(
+    stylesheet,
+    /@media print\s*\{[\s\S]*?\.cover-panel\s*\{[\s\S]*?position:\s*absolute;/,
+  );
+  assert.match(
+    stylesheet,
+    /@media print\s*\{[\s\S]*?\.cover-panel\s*\{[\s\S]*?backdrop-filter:\s*none;/,
+  );
+  assert.match(
+    stylesheet,
+    /@media print\s*\{[\s\S]*?\.cover-panel\s*\{[\s\S]*?-webkit-backdrop-filter:\s*none;/,
+  );
 });

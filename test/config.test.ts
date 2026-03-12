@@ -44,3 +44,39 @@ test('getConfig falls back to bundled templates when DROPBOXSIGN_TEMPLATE_DIR is
     }
   }
 });
+
+test('getConfig decodes URL-encoded DROPBOXSIGN_LOGO_PATH values', () => {
+  const originalLogoPath = process.env.DROPBOXSIGN_LOGO_PATH;
+
+  process.env.DROPBOXSIGN_LOGO_PATH = '/home/alexd/Pictures/EVERYDAY%20WORKFLOWS/webp/horizontallogo.webp';
+
+  try {
+    const config = getConfig();
+
+    assert.equal(config.branding.logoPath, path.resolve('/home/alexd/Pictures/EVERYDAY WORKFLOWS/webp/horizontallogo.webp'));
+  } finally {
+    if (originalLogoPath === undefined) {
+      delete process.env.DROPBOXSIGN_LOGO_PATH;
+    } else {
+      process.env.DROPBOXSIGN_LOGO_PATH = originalLogoPath;
+    }
+  }
+});
+
+test('getConfig converts file URL DROPBOXSIGN_LOGO_PATH values to filesystem paths', () => {
+  const originalLogoPath = process.env.DROPBOXSIGN_LOGO_PATH;
+
+  process.env.DROPBOXSIGN_LOGO_PATH = 'file:///tmp/Everyday%20Workflows/logo.webp';
+
+  try {
+    const config = getConfig();
+
+    assert.equal(config.branding.logoPath, path.resolve('/tmp/Everyday Workflows/logo.webp'));
+  } finally {
+    if (originalLogoPath === undefined) {
+      delete process.env.DROPBOXSIGN_LOGO_PATH;
+    } else {
+      process.env.DROPBOXSIGN_LOGO_PATH = originalLogoPath;
+    }
+  }
+});

@@ -3,7 +3,7 @@ import path from 'node:path';
 
 import matter from 'gray-matter';
 import MarkdownIt from 'markdown-it';
-import { chromium, type Browser } from 'playwright';
+import { chromium, type Browser, type Page } from 'playwright';
 
 import type { AppConfig } from '../config.js';
 import { FileSystemService } from '../storage/file-system.js';
@@ -305,6 +305,56 @@ export class ContractRenderer {
     );
   }
 
+  private async rasterizeCoverPageForPdf(page: Page): Promise<void> {
+    const coverPage = page.locator('.cover-page').first();
+
+    if (await coverPage.count() === 0) {
+      return;
+    }
+
+    const coverImageBuffer = await coverPage.screenshot({ type: 'png' });
+    const coverImageDataUri = `data:image/png;base64,${coverImageBuffer.toString('base64')}`;
+
+    await page.addStyleTag({
+      content: `
+        @media print {
+          .cover-page.cover-page-rasterized {
+            padding: 0 !important;
+            min-height: 11in !important;
+            height: 11in !important;
+            overflow: hidden !important;
+            break-after: page !important;
+            page-break-after: always !important;
+          }
+
+          .cover-page.cover-page-rasterized > .cover-page-raster {
+            display: block !important;
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+          }
+        }
+      `,
+    });
+
+    await page.evaluate((dataUri) => {
+      const coverPageElement = document.querySelector<HTMLElement>('.cover-page');
+      if (!coverPageElement) {
+        return;
+      }
+
+      const imageElement = document.createElement('img');
+      imageElement.className = 'cover-page-raster';
+      imageElement.src = dataUri;
+      imageElement.alt = '';
+
+      coverPageElement.classList.add('cover-page-rasterized');
+      coverPageElement.replaceChildren(imageElement);
+    }, coverImageDataUri);
+
+    await page.waitForTimeout(50);
+  }
+
   public async renderMarkdownFileToPdf(sourcePath: string, options: RenderOptions = {}): Promise<RenderedContractResult> {
     const { templateName = 'default', outputDirectory, outputFileName } = options;
     const resolvedSourcePath = this.fileSystemService.resolveReadablePath(sourcePath);
@@ -346,6 +396,7 @@ export class ContractRenderer {
           width: 816,
           height: 1056,
         },
+        deviceScaleFactor: 2,
       });
       await page.setContent(document.html, { waitUntil: 'networkidle' });
       // emulateMedia must be called before pdf() so @media print rules apply
@@ -354,6 +405,7 @@ export class ContractRenderer {
       // Give the compositor a moment to fully settle after media change;
       // this reduces the chance of the first-page cover layout being clipped.
       await page.waitForTimeout(120);
+      await this.rasterizeCoverPageForPdf(page);
       await page.pdf({
         path: pdfPath,
         format: 'Letter',

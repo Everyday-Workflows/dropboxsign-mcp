@@ -29,6 +29,37 @@ export interface AppConfig {
   };
 }
 
+function normalizeConfiguredFilesystemPath(value: string): string {
+  const trimmedValue = value.trim();
+
+  if (trimmedValue.startsWith('file://')) {
+    try {
+      return fileURLToPath(trimmedValue);
+    } catch {
+      return trimmedValue;
+    }
+  }
+
+  if (!trimmedValue.includes('%')) {
+    return trimmedValue;
+  }
+
+  return trimmedValue
+    .split(/([/\\]+)/)
+    .map((segment) => {
+      if (segment.length === 0 || /^[\\/]+$/.test(segment)) {
+        return segment;
+      }
+
+      try {
+        return decodeURIComponent(segment);
+      } catch {
+        return segment;
+      }
+    })
+    .join('');
+}
+
 function resolveContractsDir(): string | undefined {
   const value = process.env.DROPBOXSIGN_CONTRACTS_DIR ?? process.env.DROPBOXSIGN_VAULT_PATH;
   if (value) {
@@ -40,7 +71,7 @@ function resolveContractsDir(): string | undefined {
 
 function resolveDefaultLogoPath(): string | undefined {
   if (process.env.DROPBOXSIGN_LOGO_PATH) {
-    return path.resolve(process.env.DROPBOXSIGN_LOGO_PATH);
+    return path.resolve(normalizeConfiguredFilesystemPath(process.env.DROPBOXSIGN_LOGO_PATH));
   }
 
   return undefined;
